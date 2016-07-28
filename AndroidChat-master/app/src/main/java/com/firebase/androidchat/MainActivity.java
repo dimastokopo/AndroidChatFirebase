@@ -169,7 +169,8 @@ public class MainActivity extends Activity {
     }
 private void refreshList(){
  //   final ListView listView = getListView();
-    mChatListAdapter = fbh.getFirstChatAdapter(50,R.layout.chat_message,
+    //mChatListAdapter = fbh.getFirstChatAdapter(50,R.layout.chat_message,
+    mChatListAdapter = fbh.getChatAdapter("-KNkw2QDcuhv28NN-s7t",5,R.layout.chat_message,
     this,mProf_id,mProf_id_Others);
             //new ChatListAdapter(mFirebaseChatPerson1.limit(50), this, R.layout.chat_message, mUsername);
     listView.setAdapter(mChatListAdapter);

@@ -106,13 +106,21 @@ public Firebase getFirebaseSingleChatWithKey(String KeyMessage,String mProfID,St
         ChatHistoryListAdapter ch = new ChatHistoryListAdapter(mFirebaseHistory.limit(limit), act, IDLayout,mProf_ID);
         return ch;
     }
-
+    public ChatHistoryListAdapter getHistoryAdapter(String key_start,int limit, int IDLayout,  Activity act,String mProf_ID){
+        Firebase mFirebaseHistory=getFirebaseHistory(mProf_ID);
+        ChatHistoryListAdapter ch = new ChatHistoryListAdapter(mFirebaseHistory.orderByKey().startAt(key_start).limit(limit), act, IDLayout,mProf_ID);
+        return ch;
+    }
     public ChatListAdapter getFirstChatAdapter(int limit, int IDLayout, Activity act,String mProf_ID,String mProf_id_others) {
         Firebase mFirebaseChatPerson1=getFirebaseChatSingle(mProf_ID,mProf_id_others);
         ChatListAdapter mChatListAdapter = new ChatListAdapter(mFirebaseChatPerson1.limit(limit), act, IDLayout, mProf_ID);
         return mChatListAdapter;
     }
-
+    public ChatListAdapter getChatAdapter(String key_start,int limit, int IDLayout, Activity act,String mProf_ID,String mProf_id_others) {
+        Firebase mFirebaseChatPerson1=getFirebaseChatSingle(mProf_ID,mProf_id_others);
+        ChatListAdapter mChatListAdapter = new ChatListAdapter(mFirebaseChatPerson1.orderByKey().startAt(key_start).limit(limit), act, IDLayout, mProf_ID);
+        return mChatListAdapter;
+    }
     public ChatUsersProfile getUserProfileEntity(String mProf_id){
         Firebase firebaseProf=getFirebaseProfile(mProf_id);
         //final ChatUsersProfile cup;
