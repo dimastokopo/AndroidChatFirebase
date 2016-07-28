@@ -164,7 +164,18 @@ public Firebase getFirebaseSingleChatWithKey(String KeyMessage,String mProfID,St
     }
 
 
+    public   Map<String,Object> UsersMapFromEntity(ChatUsersProfile chat){
+        Map<String,Object> xx= new HashMap< String,Object>();
+        xx.put(  "prof_id",chat.getProf_id());
+        xx.put(  "prof_avatar",chat.getProf_avatar());
+        xx.put(  "prof_name",chat.getProf_name());
+        xx.put(  "is_typing",chat.getIs_typing());
+        xx.put(  "status",chat.getStatus());
+        xx.put(  "status_desc",chat.getStatus_desc());
 
+
+        return xx;
+    }
 public   Map<String,Object> singleChatMapFromEntity(Chat chat){
                 Map<String,Object> xx= new HashMap< String,Object>();
                 xx.put(  "message",chat.getMessage());
@@ -238,10 +249,11 @@ public void updateTickState(Chat chat,final String mProfID,final String mProfIDO
     public void addUser(ChatUsersProfile users){
         Firebase fb=getFirebaseProfile(users.getProf_id());
 
-        Map<String,Object> datauser = new HashMap< String,Object>();
-        datauser.put("prof_id",users.getProf_id());
-        datauser.put("prof_avatar",users.getProf_avatar());
-        datauser.put("prof_name",users.getProf_name());
+        Map<String,Object> datauser = UsersMapFromEntity(users);
+//        new HashMap< String,Object>();
+//        datauser.put("prof_id",users.getProf_id());
+//        datauser.put("prof_avatar",users.getProf_avatar());
+//        datauser.put("prof_name",users.getProf_name());
 
 
 
@@ -249,6 +261,20 @@ public void updateTickState(Chat chat,final String mProfID,final String mProfIDO
 
     }
 
+    public void updateUser(ChatUsersProfile users){
+        Firebase fb=getFirebaseProfile(users.getProf_id());
+
+        Map<String,Object> datauser = UsersMapFromEntity(users);
+//        new HashMap< String,Object>();
+//        datauser.put("prof_id",users.getProf_id());
+//        datauser.put("prof_avatar",users.getProf_avatar());
+//        datauser.put("prof_name",users.getProf_name());
+
+
+
+        fb.updateChildren(datauser);
+
+    }
 
 
     public void removeContact(String prof_id_session, String prof_id_page){
