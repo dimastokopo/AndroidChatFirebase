@@ -32,7 +32,7 @@ public class FirebaseHelper {
   //  private static final String FIREBASE_URL_Users ="https://scorching-fire-8526.firebaseio.com/Users/";
    // private static final String FIREBASE_URL_Groups ="https://scorching-fire-8526.firebaseio.com/Groups/";
   private static final String FIREBASE_URL_Users ="https://campaignbeta-44d01.firebaseio.com/Users/";
-    private static final String FIREBASE_URL_Groups ="https://campaignbeta-44d01.firebaseio.com//Groups/";
+  private static final String FIREBASE_URL_Groups ="https://campaignbeta-44d01.firebaseio.com//Groups/";
     ChatUsersProfile tempUserProfile=new ChatUsersProfile();
 
     //==================Firebase Database Table================================================
@@ -240,8 +240,39 @@ public void updateTickState(Chat chat,final String mProfID,final String mProfIDO
 
 
     public void removeContact(String prof_id_session, String prof_id_page){
+        removeConversation(prof_id_session,prof_id_page);
+
+        Firebase addContactOthers=getFirebaseUserAddContact(prof_id_page,prof_id_session);
+        addContactOthers.setValue(null);
+
+        Firebase addContactsSession=getFirebaseUserAddContact(prof_id_session,prof_id_page);
+        addContactsSession.setValue(null);
 
     }
+    public void removeConversation(  final String Prof_ID,   final String Prof_ID_Others ){
+
+
+        Firebase mFirebaseChatPerson1,mFirebaseChatPerson2,mFirebaseHistoryChatPerson1,mFirebaseHistoryChatPerson2;
+        mFirebaseChatPerson1 = getFirebaseChatSingle(Prof_ID,Prof_ID_Others);
+        mFirebaseChatPerson2 = getFirebaseChatSingle(Prof_ID_Others,Prof_ID);
+
+        mFirebaseHistoryChatPerson1 = getFirebaseHistoryForInsertSingle(Prof_ID,Prof_ID_Others);
+        mFirebaseHistoryChatPerson2 = getFirebaseHistoryForInsertSingle(Prof_ID_Others,Prof_ID);
+
+
+
+        mFirebaseChatPerson1.setValue(null);
+        mFirebaseChatPerson2.setValue(null);
+
+        mFirebaseHistoryChatPerson1.setValue(null);
+        mFirebaseHistoryChatPerson2.setValue(null);
+
+
+
+
+    }
+
+
     public void removeSingleChat(final String keyMessageProfID, final String Prof_ID, String OtherKeyMessage, final String Prof_ID_Others ){
 
         //   var ref = new Firebase("https://dinosaur-facts.firebaseio.com/dinosaurs");
