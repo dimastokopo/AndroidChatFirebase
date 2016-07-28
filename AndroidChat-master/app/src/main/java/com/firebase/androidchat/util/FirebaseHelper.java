@@ -36,7 +36,7 @@ public class FirebaseHelper {
     ChatUsersProfile tempUserProfile=new ChatUsersProfile();
 
     //==================Firebase Database Table================================================
-  public Firebase getFirebaseHistory(String mProfID){
+    public Firebase getFirebaseHistory(String mProfID){
         String FIREBASE_URL_HISTORY=FIREBASE_URL_Users+mProfID;
         Firebase mFirebaseHistory = new Firebase(FIREBASE_URL_HISTORY).child("History Chat");
         return mFirebaseHistory;
@@ -162,25 +162,28 @@ public Firebase getFirebaseSingleChatWithKey(String KeyMessage,String mProfID,St
         ChatUsersContactAdapter cgp=new ChatUsersContactAdapter(firebaseGroup.limit(limit),act,IDLayout);
         return cgp;
     }
+
+
+
 public   Map<String,Object> singleChatMapFromEntity(Chat chat){
-    Map<String,Object> xx= new HashMap< String,Object>();
-    xx.put(  "message",chat.getMessage());
-    xx.put(  "author",chat.getAuthor());
-   xx.put(  "date",chat.getDate().getTime());
- xx.put(  "prof_id",chat.getProf_id());
-    xx.put(  "from",chat.getFrom());
- xx.put(  "message_type",chat.getMessage_type());
- xx.put(  "image_url",chat.getImage_url());
- xx.put(  "title_url",chat.getTitle_url());
- xx.put(  "descrip_url",chat.getDescrip_url());
- xx.put(  "url",chat.getUrl());
-  xx.put(  "old",chat.getOld());
-   xx.put(  "self",chat.getSelf());
-           xx.put(  "sent",chat.getSent());
-                   xx.put(  "tickstate",chat.getTickstate());
-    xx.put("otherKeyMessage",chat.getOtherKeyMessage());
-    xx.put("selfKeyMessage",chat.getSelfKeyMessage());
-    xx.put("selfKeyMessage",chat.getSelfKeyMessage());
+                Map<String,Object> xx= new HashMap< String,Object>();
+                xx.put(  "message",chat.getMessage());
+                xx.put(  "author",chat.getAuthor());
+               xx.put(  "date",chat.getDate().getTime());
+             xx.put(  "prof_id",chat.getProf_id());
+                xx.put(  "from",chat.getFrom());
+             xx.put(  "message_type",chat.getMessage_type());
+             xx.put(  "image_url",chat.getImage_url());
+             xx.put(  "title_url",chat.getTitle_url());
+             xx.put(  "descrip_url",chat.getDescrip_url());
+             xx.put(  "url",chat.getUrl());
+              xx.put(  "old",chat.getOld());
+               xx.put(  "self",chat.getSelf());
+                       xx.put(  "sent",chat.getSent());
+                               xx.put(  "tickstate",chat.getTickstate());
+                xx.put("otherKeyMessage",chat.getOtherKeyMessage());
+                xx.put("selfKeyMessage",chat.getSelfKeyMessage());
+                xx.put("selfKeyMessage",chat.getSelfKeyMessage());
 
 
     return xx;
@@ -189,6 +192,7 @@ public   Map<String,Object> singleChatMapFromEntity(Chat chat){
 
 
     //==================Firebase Action=================================================
+
 public void updateTickState(Chat chat,final String mProfID,final String mProfIDOthers){
     String KeyMessage=chat.getSelfKeyMessage();
     Firebase fbCHat1=getFirebaseSingleChatWithKey(KeyMessage, mProfID, mProfIDOthers);
@@ -280,28 +284,50 @@ public void updateTickState(Chat chat,final String mProfID,final String mProfIDO
 
     }
 
+public void updateSingleMessageChat(Chat message,String prof_id,String prof_id_others){
+    Firebase mFirebaseChatPerson1,mFirebaseChatPerson2 ;
 
+    mFirebaseChatPerson1 = getFirebaseChatSingle(prof_id,prof_id_others);
+    mFirebaseChatPerson2 = getFirebaseChatSingle(prof_id,prof_id);
+
+    Firebase xchat=  mFirebaseChatPerson1.child(message.getSelfKeyMessage());
+
+
+    Chat message2=message;
+
+    Firebase xchat2=  mFirebaseChatPerson1.child(message.getOtherKeyMessage());
+
+
+    String key1=xchat.getKey();
+    String key2=xchat2.getKey();
+
+
+    message.setSelfKeyMessage(key1);
+    message2.setSelfKeyMessage(key2);
+
+
+
+    message.setOtherKeyMessage(key2);
+    message2.setOtherKeyMessage(key1);
+
+    Map<String,Object> mapchat=singleChatMapFromEntity(message);
+    Map<String,Object> mapchat2=singleChatMapFromEntity(message2);
+
+
+    xchat.updateChildren(mapchat);
+
+    xchat2.updateChildren(mapchat2);
+
+}
     public void removeSingleChat(final String keyMessageProfID, final String Prof_ID, String OtherKeyMessage, final String Prof_ID_Others ){
 
-        //   var ref = new Firebase("https://dinosaur-facts.firebaseio.com/dinosaurs");
-        //  Firebase history1=getFirebaseHistoryForInsertSingle()
-        // ref.orderByChild("height").equalTo(25).on("child_added", function(snapshot) {
-        //console.log(snapshot.key());
-        //  });
+
         Firebase mFirebaseChatPerson1,mFirebaseChatPerson2,mFirebaseHistoryChatPerson1,mFirebaseHistoryChatPerson2;
         mFirebaseChatPerson1 = getFirebaseChatSingle(Prof_ID,Prof_ID_Others);
         mFirebaseChatPerson2 = getFirebaseChatSingle(Prof_ID_Others,Prof_ID);
 
-        mFirebaseHistoryChatPerson1 = getFirebaseHistoryForInsertSingle(Prof_ID,Prof_ID_Others);
-        mFirebaseHistoryChatPerson2 = getFirebaseHistoryForInsertSingle(Prof_ID_Others,Prof_ID);
 
-
-            // Create our 'model', a Chat object
-            // Chat chat = new Chat(message, mProfID,new Timestamp(System.currentTimeMillis()));
-            Timestamp date=new Timestamp(System.currentTimeMillis());
-
-            // Create a new, auto-generated child of that chat location, and save our chat data there
-            final Firebase xchat=  mFirebaseChatPerson1.child(keyMessageProfID);
+              final Firebase xchat=  mFirebaseChatPerson1.child(keyMessageProfID);
             xchat.setValue(null);
 
 
@@ -313,8 +339,6 @@ public void updateTickState(Chat chat,final String mProfID,final String mProfIDO
             xchat2.setValue(null);
 
 
-     //   Firebase ref = new Firebase("https://docs-examples.firebaseio.com/web/saving-data/fireblog/posts");
-        // Attach an listener to read the data at our posts reference
         Query queryRef = mFirebaseChatPerson1.orderByChild("date").limitToLast(2);
         removeHistoryChat(Prof_ID,Prof_ID_Others);
         queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -344,32 +368,7 @@ public void updateTickState(Chat chat,final String mProfID,final String mProfIDO
 
 
 
-            //  historyChatperson1.put("keyMessageProfID",mFirebaseChatPerson2.getKey());
-            // historyChatperson1.put("keyMessageOthers",mFirebaseChatPerson1.getKey());
 
-          //  mFirebaseHistoryChatPerson1.updateChildren(historyChatperson1);
-           //  mFirebaseHistoryChatPerson2.updateChildren(historyChatperson2);
-
-/*
-        Map<String,Object> historyChatperson1 = new HashMap< String,Object>();
-        historyChatperson1.put("from",mProfID);
-        historyChatperson1.put("last_message",message);
-        historyChatperson1.put("name",mProfIDOthers);
-        historyChatperson1.put("type","single");
-        historyChatperson1.put("date",date.getTime());
-        historyChatperson1.put("tickstate",tickstate);
-
-        Map<String,Object> historyChatperson2 = new HashMap< String,Object>();
-        historyChatperson2.put("from",mProfID);
-        historyChatperson2.put("last_message",message);
-        historyChatperson2.put("name",mProfID );
-        historyChatperson2.put("type","single");
-        historyChatperson2.put("date",date.getTime());
-        historyChatperson2.put("tickstate",tickstate);
-
-        mFirebaseHistoryChatPerson1.updateChildren(historyChatperson1);
-        mFirebaseHistoryChatPerson2.updateChildren(historyChatperson2);
-*/
     }
 
     public void sendSingleMessage(String message,String mProfID,String mProfIDOthers, String message_type,
