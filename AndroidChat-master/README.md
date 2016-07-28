@@ -1,13 +1,13 @@
 # Firebase Chat for Android
 
-A simple chat application that built with Firebase on Android.
+Chatting Sederhana menggunakan database firebase di platform android
 
 ![Screenshot](screenshot.png)
 
 ## Setup
 
-Update [`MainActivity`](/app/src/main/java/com/firebase/androidchat/MainActivity.java) and replace
-`https://android-chat.firebaseio-demo.com` with a reference to your Firebase.
+ganti (AndroidChat-master\app\src\main\java\com\firebase\androidchat\util\FirebaseHelper.java)  URL FIrebase 
+`https://campaignbeta-44d01.firebaseio.com/` dengan URL milikmu.
 
 ## What's here
 
