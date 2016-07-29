@@ -113,5 +113,14 @@
         android:layout_toRightOf="@+id/prof_id_page"
         android:layout_below="@+id/btnReg" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Create Group"
+        android:id="@+id/btnCreateGroup"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
 
 </RelativeLayout>

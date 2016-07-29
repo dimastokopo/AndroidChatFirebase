@@ -22,7 +22,8 @@
         </activity>
         <activity android:name=".ListActiveChat" />
         <activity android:name=".GroupChat" />
-        <activity android:name=".ContactListActivity"></activity>
+        <activity android:name=".ContactListActivity" />
+        <activity android:name=".NewGroup"></activity>
     </application>
 
 </manifest>

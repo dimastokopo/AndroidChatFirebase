@@ -45,16 +45,21 @@ public class ChatUsersContactAdapter extends FirebaseListAdapter<ChatProfileCont
         firebaseProf.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                ChatUsersProfile facts=new ChatUsersProfile(snapshot.child("prof_id").getValue().toString(),
-                        snapshot.child("prof_avatar").getValue().toString(),
-                        snapshot.child("prof_name").getValue().toString());
-                 ImageView imgAvatar=(ImageView)view.findViewById(R.id.imageViewUserAvatar);
+                if (snapshot.exists()){
 
-                TextView txtUsername=(TextView)view.findViewById(R.id.textViewUserName);
-                txtUsername.setText(facts.getProf_name());
-                Picasso.with(context)
-                        .load(facts.getProf_avatar())
-                        .into(imgAvatar);
+                    ChatUsersProfile facts=new ChatUsersProfile(snapshot.child("prof_id").getValue().toString(),
+                            snapshot.child("prof_avatar").getValue().toString(),
+                            snapshot.child("prof_name").getValue().toString());
+
+                    ImageView imgAvatar=(ImageView)view.findViewById(R.id.imageViewUserAvatar);
+
+                    TextView txtUsername=(TextView)view.findViewById(R.id.textViewUserName);
+                    txtUsername.setText(facts.getProf_name());
+                    Picasso.with(context)
+                            .load(facts.getProf_avatar())
+                            .into(imgAvatar);
+
+                }
 
 
             }

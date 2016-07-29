@@ -4,12 +4,15 @@ import android.app.Activity;
 import android.graphics.Color;
 
 import com.firebase.androidchat.Adapter.ChatGroupMemberAdapter;
+import com.firebase.androidchat.Adapter.ChatHeaderAdapter;
 import com.firebase.androidchat.Adapter.ChatHistoryListAdapter;
 import com.firebase.androidchat.Adapter.ChatListAdapter;
 import com.firebase.androidchat.Adapter.ChatUsersContactAdapter;
 import com.firebase.androidchat.Entity.Chat;
+import com.firebase.androidchat.Entity.ChatGroupMember;
 import com.firebase.androidchat.Entity.ChatGroupProperty;
 
+import com.firebase.androidchat.Entity.ChatHistory;
 import com.firebase.androidchat.Entity.ChatProfileContact;
 import com.firebase.androidchat.Entity.ChatUsersContact;
 import com.firebase.androidchat.Entity.ChatUsersProfile;
@@ -32,7 +35,9 @@ public class FirebaseHelper {
   //  private static final String FIREBASE_URL_Users ="https://scorching-fire-8526.firebaseio.com/Users/";
    // private static final String FIREBASE_URL_Groups ="https://scorching-fire-8526.firebaseio.com/Groups/";
   private static final String FIREBASE_URL_Users ="https://campaignbeta-44d01.firebaseio.com/Users/";
-  private static final String FIREBASE_URL_Groups ="https://campaignbeta-44d01.firebaseio.com//Groups/";
+
+  private static final String FIREBASE_URL_Root ="https://campaignbeta-44d01.firebaseio.com/";
+    private static final String FIREBASE_URL_Groups ="https://campaignbeta-44d01.firebaseio.com/Groups/";
     ChatUsersProfile tempUserProfile=new ChatUsersProfile();
 
     //==================Firebase Database Table================================================
@@ -58,6 +63,9 @@ public class FirebaseHelper {
         return mFirebaseChatPerson1;
     }
 
+
+
+
     public Firebase getFirebaseUserContact(String mProfID){
         String FIREBASE_URL_HISTORY=FIREBASE_URL_Users+mProfID;
         Firebase mFirebaseHistory = new Firebase(FIREBASE_URL_HISTORY).child("Contacts");
@@ -68,24 +76,32 @@ public class FirebaseHelper {
         Firebase mFirebaseHistory = new Firebase(FIREBASE_URL_HISTORY).child(mProfIDAdd);
         return mFirebaseHistory;
     }
-   public Firebase getFirebaseChatGroupMessage(String mGroupName ){
-        String FirebaseGroupChat=FIREBASE_URL_Groups+mGroupName;
+    public Firebase getFirebaseChatGroupRoot(){
+        String FirebaseGroupChat=FIREBASE_URL_Groups;
+
+        Firebase mFirebaseChatPerson1 = new Firebase(FirebaseGroupChat);
+        //.child("Groups");
+
+        return mFirebaseChatPerson1;
+    }
+   public Firebase getFirebaseChatGroupMessage(String mGroupKey ){
+        String FirebaseGroupChat=FIREBASE_URL_Groups+mGroupKey;
 
         Firebase mFirebaseChatPerson1 = new Firebase(FirebaseGroupChat).child("Messages");
 
         return mFirebaseChatPerson1;
     }
-    public Firebase getFirebaseChatGroupMembers(String mGroupName ){
-        String FirebaseGroupChat=FIREBASE_URL_Groups+mGroupName;
+    public Firebase getFirebaseChatGroupMembers(String mGroupKey ){
+        String FirebaseGroupChat=FIREBASE_URL_Groups+mGroupKey;
 
         Firebase mFirebaseChatPerson1 = new Firebase(FirebaseGroupChat).child("Members");
 
         return mFirebaseChatPerson1;
     }
-    public Firebase getFirebaseChatGroupProperty(String mGroupName ){
+    public Firebase getFirebaseChatGroupProperty(String mGroupKey ){
         String FirebaseGroupChat=FIREBASE_URL_Groups;
         // String FirebaseSingleChatUser1=FIREBASE_URL_Users+mProfID+"/SingleChat/";
-        Firebase mFirebaseChatPerson1 = new Firebase(FirebaseGroupChat).child(mGroupName);
+        Firebase mFirebaseChatPerson1 = new Firebase(FirebaseGroupChat).child(mGroupKey);
         return mFirebaseChatPerson1;
     }
 public Firebase getFirebaseSingleChatWithKey(String KeyMessage,String mProfID,String mProfIDOthers){
@@ -106,14 +122,12 @@ public Firebase getFirebaseSingleChatWithKey(String KeyMessage,String mProfID,St
         ChatHistoryListAdapter ch = new ChatHistoryListAdapter(mFirebaseHistory.limit(limit), act, IDLayout,mProf_ID);
         return ch;
     }
-    public ChatHistoryListAdapter getHistoryAdapter(String key_start,int limit, int IDLayout,  Activity act,String mProf_ID){
-        Firebase mFirebaseHistory=getFirebaseHistory(mProf_ID);
-        ChatHistoryListAdapter ch = new ChatHistoryListAdapter(mFirebaseHistory.orderByKey().startAt(key_start).limit(limit), act, IDLayout,mProf_ID);
-        return ch;
-    }
+
     public ChatListAdapter getFirstChatAdapter(int limit, int IDLayout, Activity act,String mProf_ID,String mProf_id_others) {
         Firebase mFirebaseChatPerson1=getFirebaseChatSingle(mProf_ID,mProf_id_others);
+
         ChatListAdapter mChatListAdapter = new ChatListAdapter(mFirebaseChatPerson1.limit(limit), act, IDLayout, mProf_ID);
+
         return mChatListAdapter;
     }
     public ChatListAdapter getChatAdapter(String key_start,int limit, int IDLayout, Activity act,String mProf_ID,String mProf_id_others) {
@@ -121,6 +135,23 @@ public Firebase getFirebaseSingleChatWithKey(String KeyMessage,String mProfID,St
         ChatListAdapter mChatListAdapter = new ChatListAdapter(mFirebaseChatPerson1.orderByKey().startAt(key_start).limit(limit), act, IDLayout, mProf_ID);
         return mChatListAdapter;
     }
+
+    public ChatHistoryListAdapter getHistoryAdapter(String key_start,int limit, int IDLayout,  Activity act,String mProf_ID){
+        Firebase mFirebaseHistory=getFirebaseHistory(mProf_ID);
+        ChatHistoryListAdapter ch = new ChatHistoryListAdapter(mFirebaseHistory.orderByKey().startAt(key_start).limit(limit), act, IDLayout,mProf_ID);
+        return ch;
+    }
+
+    public ChatHeaderAdapter getHeaderSingleCHatAdapter(  int IDLayout, Activity act, String mProf_ID,String mProf_id_others){
+        Firebase mFirebaseHistory=getFirebaseHistory(mProf_ID);
+        Query ref=mFirebaseHistory.orderByChild("others_id").startAt(mProf_id_others).limit(1);
+        //Firebase fh=getFirebaseHistoryForInsertSingle(mProf_ID,mProf_id_others);
+        ChatHeaderAdapter ch = new ChatHeaderAdapter(ref, act, IDLayout,mProf_ID);
+        return ch;
+    }
+
+
+
     public ChatUsersProfile getUserProfileEntity(String mProf_id){
         Firebase firebaseProf=getFirebaseProfile(mProf_id);
         //final ChatUsersProfile cup;
@@ -169,7 +200,6 @@ public Firebase getFirebaseSingleChatWithKey(String KeyMessage,String mProfID,St
         xx.put(  "prof_id",chat.getProf_id());
         xx.put(  "prof_avatar",chat.getProf_avatar());
         xx.put(  "prof_name",chat.getProf_name());
-        xx.put(  "is_typing",chat.getIs_typing());
         xx.put(  "status",chat.getStatus());
         xx.put(  "status_desc",chat.getStatus_desc());
 
@@ -199,6 +229,48 @@ public   Map<String,Object> singleChatMapFromEntity(Chat chat){
 
     return xx;
 }
+
+    /**
+     * Fungsi untuk mengubah entity menjadi adapter
+     * @param chatHistory  diisi entity history chat yang akan diubah menjadi map
+     * @return
+     */
+    public   Map<String,Object> HistoryChatMapFromEntity(ChatHistory chatHistory){
+        Map<String,Object> historyChatperson1= new HashMap< String,Object>();
+        historyChatperson1.put("from",chatHistory.getFrom());
+        historyChatperson1.put("last_message",chatHistory.getLast_message());
+        historyChatperson1.put("name",chatHistory.getName());
+        historyChatperson1.put("type",chatHistory.getType());
+        historyChatperson1.put("date",chatHistory.getDate().getTime());
+        historyChatperson1.put("tickstate",chatHistory.getTickstate());
+        historyChatperson1.put("last_key_message",chatHistory.getLast_key_message());
+
+        historyChatperson1.put(  "is_typing", chatHistory.getIs_typing() );
+        historyChatperson1.put("others_id",chatHistory.getOthers_id());
+
+
+        return historyChatperson1;
+    }
+
+    public   Map<String,Object> HistoryChatMapFromSnapshotSetisTyping(DataSnapshot chatHistory,String is_typing){
+        Map<String,Object> historyChatperson1= new HashMap< String,Object>();
+
+        historyChatperson1.put("from",chatHistory.child("from").getValue());
+        historyChatperson1.put("last_message",chatHistory.child("last_message").getValue());
+        historyChatperson1.put("name",chatHistory.child("name").getValue());
+        historyChatperson1.put("type",chatHistory.child("type").getValue());
+        historyChatperson1.put("date",chatHistory.child("date").getValue());
+        historyChatperson1.put("tickstate",chatHistory.child("tickstate").getValue());
+        historyChatperson1.put("last_key_message",chatHistory.child("last_key_message").getValue());
+
+        historyChatperson1.put(  "is_typing", is_typing );
+        historyChatperson1.put("others_id",chatHistory.child("others_id").getValue());
+
+
+        return historyChatperson1;
+    }
+
+
     //==================Firebase Get Data================================================
 
 
@@ -210,7 +282,7 @@ public void updateTickState(Chat chat,final String mProfID,final String mProfIDO
     chat.setTickstate("2");
     Map<String,Object> singleChat1 = singleChatMapFromEntity(chat);
     updateHistoryChat(mProfID,mProfIDOthers,chat.getMessage(),"single",chat.getDate().getTime(),"2",
-            chat.getSelfKeyMessage(),chat.getOtherKeyMessage());
+            chat.getSelfKeyMessage(),chat.getOtherKeyMessage(),"0");
     fbCHat1.updateChildren(singleChat1);
 
     fbCHat1.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -245,7 +317,14 @@ public void updateTickState(Chat chat,final String mProfID,final String mProfIDO
 
     }
 
+public  void CreateGroup(String GroupName,String GroupAvatar,String Prof_ID_Creator,String Prof_Name_Creator){
+    Firebase fbg=getFirebaseChatGroupRoot();
+    Firebase groupAdd=fbg.push();
+    ChatGroupProperty cgp=new ChatGroupProperty(groupAdd.getKey(),GroupName,GroupAvatar,
+            Prof_ID_Creator,Prof_Name_Creator,new Timestamp(System.currentTimeMillis()));
+    groupAdd.setValue(cgp);
 
+}
     public void addUser(ChatUsersProfile users){
         Firebase fb=getFirebaseProfile(users.getProf_id());
 
@@ -254,10 +333,7 @@ public void updateTickState(Chat chat,final String mProfID,final String mProfIDO
 //        datauser.put("prof_id",users.getProf_id());
 //        datauser.put("prof_avatar",users.getProf_avatar());
 //        datauser.put("prof_name",users.getProf_name());
-
-
-
-        fb.setValue(datauser);
+       fb.setValue(datauser);
 
     }
 
@@ -341,7 +417,6 @@ public void updateSingleMessageChat(Chat message,String prof_id,String prof_id_o
 
 
     xchat.updateChildren(mapchat);
-
     xchat2.updateChildren(mapchat2);
 
 }
@@ -377,7 +452,7 @@ public void updateSingleMessageChat(Chat message,String prof_id,String prof_id_o
                     for (DataSnapshot postSnapshot: snapshot.getChildren()) {
                         Chat post = postSnapshot.getValue(Chat.class);
                         updateHistoryChat(Prof_ID,Prof_ID_Others,post.getMessage(),post.getMessage_type(),post.getDate().getTime(),
-                                post.getTickstate(),post.getSelfKeyMessage(),post.getOtherKeyMessage());
+                                post.getTickstate(),post.getSelfKeyMessage(),post.getOtherKeyMessage(),"0");
 
                         //    System.out.println(post.getAuthor() + " - " + post.getTitle());
                     }
@@ -409,8 +484,8 @@ public void updateSingleMessageChat(Chat message,String prof_id,String prof_id_o
         Firebase mFirebaseChatPerson1,mFirebaseChatPerson2,mFirebaseHistoryChatPerson1,mFirebaseHistoryChatPerson2;
         mFirebaseChatPerson1 = getFirebaseChatSingle(mProfID,mProfIDOthers);
         mFirebaseChatPerson2 = getFirebaseChatSingle(mProfIDOthers,mProfID);
-        mFirebaseHistoryChatPerson1 = getFirebaseHistoryForInsertSingle(mProfID,mProfIDOthers);
-        mFirebaseHistoryChatPerson2 = getFirebaseHistoryForInsertSingle(mProfIDOthers,mProfID);
+      //  mFirebaseHistoryChatPerson1 = getFirebaseHistoryForInsertSingle(mProfID,mProfIDOthers);
+     //   mFirebaseHistoryChatPerson2 = getFirebaseHistoryForInsertSingle(mProfIDOthers,mProfID);
 
         if (!message.equals("")) {
             // Create our 'model', a Chat object
@@ -462,7 +537,7 @@ public void updateSingleMessageChat(Chat message,String prof_id,String prof_id_o
             xchat.setValue(chat);
             xchat2.setValue(chat2);
 
-            updateHistoryChat(mProfID,mProfIDOthers,message,"single",date.getTime(),"1",key1,key2);
+            updateHistoryChat(mProfID,mProfIDOthers,message,"single",date.getTime(),"1",key1,key2,"0");
 
             chat.setTickstate("1");
             chat2.setTickstate("1");
@@ -472,8 +547,59 @@ public void updateSingleMessageChat(Chat message,String prof_id,String prof_id_o
 
         }
     }
+
+    /**
+     *
+     * @param mProf_id_typing prof id yang sedang mengetik
+     * @param mProf_ID_Others prof id orang lain yang menerima message
+     * @param is_typing value "0" = tidak sedang mengetik, "1" sedang mengetik
+     */
+    public void set_is_typing(final String mProf_id_typing, String mProf_ID_Others, final String is_typing){
+        //get history chat another persons
+
+        final Firebase   mFirebaseHistoryChatOthers = getFirebaseHistoryForInsertSingle(mProf_ID_Others,mProf_id_typing);
+//        Query queryRef = mFirebaseChatPerson1.orderByChild("date").limitToLast(2);
+ //       removeHistoryChat(Prof_ID,Prof_ID_Others);
+
+        mFirebaseHistoryChatOthers.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                 //   System.out.println("##History Count :" + snapshot.getChildrenCount() + "");
+                    for (DataSnapshot postSnapshot: snapshot.getChildren()) {
+                        if(postSnapshot.exists()){
+                          //  ChatHistory post = postSnapshot.getValue(ChatHistory.class);
+                            //post.setIs_typing(is_typing);
+                            Map<String,Object> maph=HistoryChatMapFromSnapshotSetisTyping(snapshot,is_typing);
+
+
+
+                            mFirebaseHistoryChatOthers.updateChildren(maph);
+                        }
+
+                        //    System.out.println(post.getAuthor() + " - " + post.getTitle());
+
+
+                    }
+                }else{
+                    ChatHistory post = new ChatHistory(mProf_id_typing,mProf_id_typing,new Timestamp(System.currentTimeMillis()),"single","");
+                    post.setIs_typing(is_typing);
+                    Map<String,Object> maph=HistoryChatMapFromEntity(post);
+                    mFirebaseHistoryChatOthers.updateChildren(maph);
+                }
+
+            }
+
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                System.out.println("The read failed: " + firebaseError.getMessage());
+            }
+        });
+
+    }
 public void updateHistoryChat(String mProfID,String mProfIDOthers,String message, String type, long datetime, String tickstate,String keyMessageProfID1,
-                              String keyMessageProfIDOthers  ){
+                              String keyMessageProfIDOthers,String is_typing  ){
 
 
     Firebase mFirebaseHistoryChatPerson1 = getFirebaseHistoryForInsertSingle(mProfID,mProfIDOthers);
@@ -496,6 +622,7 @@ public void updateHistoryChat(String mProfID,String mProfIDOthers,String message
     historyChatperson1.put("tickstate",tickstate);
     historyChatperson1.put("last_key_message",keyMessageProfID1);
 
+    historyChatperson1.put(  "is_typing", is_typing );
     historyChatperson1.put("others_id",mProfIDOthers);
 
 
@@ -512,6 +639,7 @@ public void updateHistoryChat(String mProfID,String mProfIDOthers,String message
     historyChatperson2.put("tickstate",tickstate);
     historyChatperson2.put("last_key_message",keyMessageProfIDOthers);
     historyChatperson2.put("others_id",mProfID  );
+    historyChatperson2.put(  "is_typing", is_typing );
   //  historyChatperson1.put("unread_message",unread);
     mFirebaseHistoryChatPerson1.updateChildren(historyChatperson1);
     mFirebaseHistoryChatPerson2.updateChildren(historyChatperson2);
@@ -519,7 +647,56 @@ public void updateHistoryChat(String mProfID,String mProfIDOthers,String message
 
 
 }
+    public void updateHistoryChatGroups(String mProfIDHistoryOwner,String mProfIDAuthorMessage,String mGroupID,String message, String type,
+                                        long datetime, String tickstate,String keyMessageProfID1,
+                                  String keyMessageProfIDOthers,String is_typing  ){
 
+
+        Firebase mFirebaseHistoryChatPerson1 = getFirebaseHistoryForInsertSingle(mProfIDHistoryOwner,mGroupID);
+
+
+
+
+     //   Firebase   mFirebaseHistoryChatPerson2 = getFirebaseHistoryForInsertSingle(mProfIDOthers,mProfID);
+
+
+
+
+
+        Map<String,Object> historyChatperson1 = new HashMap< String,Object>();
+        historyChatperson1.put("from",mProfIDAuthorMessage);
+        historyChatperson1.put("last_message",message);
+        historyChatperson1.put("name",mGroupID);
+        historyChatperson1.put("type","single");
+        historyChatperson1.put("date",datetime);
+        historyChatperson1.put("tickstate",tickstate);
+        historyChatperson1.put("last_key_message",keyMessageProfID1);
+
+        historyChatperson1.put(  "is_typing", is_typing );
+        historyChatperson1.put("others_id",mGroupID);
+
+
+
+        //  historyChatperson1.put("unread_message",unread);
+
+
+//        Map<String,Object> historyChatperson2 = new HashMap< String,Object>();
+//        historyChatperson2.put("from",mProfID);
+//        historyChatperson2.put("last_message",message);
+//        historyChatperson2.put("name",mProfID );
+//        historyChatperson2.put("type","single");
+//        historyChatperson2.put("date",datetime);
+//        historyChatperson2.put("tickstate",tickstate);
+//        historyChatperson2.put("last_key_message",keyMessageProfIDOthers);
+//        historyChatperson2.put("others_id",mProfID  );
+//        historyChatperson2.put(  "is_typing", is_typing );
+        //  historyChatperson1.put("unread_message",unread);
+        mFirebaseHistoryChatPerson1.updateChildren(historyChatperson1);
+//        mFirebaseHistoryChatPerson2.updateChildren(historyChatperson2);
+
+
+
+    }
     public void removeHistoryChat(String mProfID,String mProfIDOthers){
         Firebase mFirebaseHistoryChatPerson1 = getFirebaseHistoryForInsertSingle(mProfID,mProfIDOthers);
         Firebase   mFirebaseHistoryChatPerson2 = getFirebaseHistoryForInsertSingle(mProfIDOthers,mProfID);
@@ -527,6 +704,134 @@ public void updateHistoryChat(String mProfID,String mProfIDOthers,String message
         mFirebaseHistoryChatPerson2.removeValue();
 
     }
+
+    public void setForTextTypingStatus(String mProf_id,String mProf_id_others,final Activity act){
+        Firebase fh=getFirebaseHistoryForInsertSingle(mProf_id,mProf_id_others);
+
+        fh.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    //   System.out.println("##History Count :" + snapshot.getChildrenCount() + "");
+                    for (DataSnapshot postSnapshot: snapshot.getChildren()) {
+                        if(postSnapshot.exists()){
+                         if(  postSnapshot.child("is_typing").getValue()!=null){
+                             if( postSnapshot.child("is_typing").getValue().equals("")
+                                     ||postSnapshot.child("is_typing").getValue().equals("0")){
+                                 act.setTitle(act.getTitle());
+                             }else{
+
+                                 act.setTitle(act.getTitle()+" lainnya sedang mengetik ");
+
+                             }
+                         }
+
+
+                            //  ChatHistory post = postSnapshot.getValue(ChatHistory.class);
+                            //post.setIs_typing(is_typing);
+                           // Map<String,Object> maph=HistoryChatMapFromSnapshotSetisTyping(snapshot,is_typing);
+
+
+
+                          //  mFirebaseHistoryChatOthers.updateChildren(maph);
+                        }
+
+                        //    System.out.println(post.getAuthor() + " - " + post.getTitle());
+
+
+                    }
+                }
+
+            }
+
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                System.out.println("The read failed: " + firebaseError.getMessage());
+            }
+        });
+    }
+
+
+    public void joinGroup(String GroupKey,String Prof_id,Timestamp JoinDate, String prof_name,
+                          String prof_avatar,
+                          Timestamp joinDate){
+        //[##JOIN##]
+        String defaultMessage="[##JOIN##] joined group";
+
+        Firebase fbg=getFirebaseChatGroupRoot();
+        Firebase groupAdd=fbg.child(GroupKey + "/Members/" + Prof_id);
+        ChatGroupMember cgp=new ChatGroupMember( Prof_id,prof_name,prof_avatar,joinDate);
+        groupAdd.setValue(cgp);
+
+
+    }
+
+    public void sendGroupMessage(String message,String mProfIDSender,String mGroupID, String message_type,
+                                  String image_url,
+                                  String title_url,
+                                  String descrip_url,
+                                  String url,
+                                  String old,
+                                  String self,
+                                  String sent,
+                                  String tickstate) {
+        Firebase mFirebaseChatGroup,mFirebaseChatMembers,mFirebaseHistoryChatPerson1,mFirebaseHistoryChatPerson2;
+        mFirebaseChatGroup = getFirebaseChatGroupMessage( mGroupID);
+     //   mFirebaseChatPerson2 = getFirebaseChatSingle(mGroupID,mProfID);
+        //  mFirebaseHistoryChatPerson1 = getFirebaseHistoryForInsertSingle(mProfID,mProfIDOthers);
+        //   mFirebaseHistoryChatPerson2 = getFirebaseHistoryForInsertSingle(mProfIDOthers,mProfID);
+
+        if (!message.equals("")) {
+            // Create our 'model', a Chat object
+            // Chat chat = new Chat(message, mProfID,new Timestamp(System.currentTimeMillis()));
+            Timestamp date=new Timestamp(System.currentTimeMillis());
+            Chat chat = new Chat(message, mProfIDSender,date
+                    ,mGroupID,
+                    message_type,
+                    image_url,
+                    title_url,
+                    descrip_url,
+                    url,
+                    old,
+                    self,
+                    sent,
+                    tickstate,"",""
+            );
+
+
+
+
+            // Create a new, auto-generated child of that chat location, and save our chat data there
+            Firebase xchat=  mFirebaseChatGroup.push();
+          //  Firebase xchat2= mFirebaseChatPerson2.push();
+            String key1=xchat.getKey();
+      //      String key2=xchat2.getKey();
+
+
+            chat.setSelfKeyMessage(key1);
+          //  chat2.setSelfKeyMessage(key2);
+
+
+
+           // chat.setOtherKeyMessage(key2);
+         //   chat2.setOtherKeyMessage(key1);
+
+
+            xchat.setValue(chat);
+           // xchat2.setValue(chat2);
+
+            //updateHistoryChatGroups(mProfIDSender,mGroupID,message,"Groups",date.getTime(),"1",key1,"","0");
+
+            chat.setTickstate("1");
+           // chat2.setTickstate("1");
+            xchat.setValue(chat);
+          //  xchat2.setValue(chat2);
+
+
+        }
+    }
+
     //==================Firebase Action=================================================
 
 }

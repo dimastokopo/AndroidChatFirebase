@@ -22,7 +22,7 @@ import com.firebase.client.ValueEventListener;
 import java.sql.Timestamp;
 
 public class GroupChat extends Activity {
-    private static final String FIREBASE_URL_Users ="https://scorching-fire-8526.firebaseio.com/Users/";
+  //  private static final String FIREBASE_URL_Users ="https://scorching-fire-8526.firebaseio.com/Users/";
     private static final String FIREBASE_URL_Groups ="https://scorching-fire-8526.firebaseio.com/Groups/";
 
     //"https://android-chat.firebaseio-demo.com";

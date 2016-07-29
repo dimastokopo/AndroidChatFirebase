@@ -17,6 +17,19 @@ public class ChatGroupProperty {
 private ChatGroupProperty(){
 
 }
+    public ChatGroupProperty(    String group_id,
+              String group_name,
+              String group_avatar,
+              String createdby_prof_id,
+              String createdby_prof_name,
+              Timestamp created_date) {
+        this.group_id=group_id;
+                this.group_name=group_name;
+                this.group_avatar=group_avatar;
+                this.createdby_prof_id=createdby_prof_id;
+                this.createdby_prof_name=createdby_prof_name;
+                this.created_date=created_date;
+    }
 
     public String getGroup_id() {
         return group_id;

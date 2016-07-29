@@ -1,5 +1,6 @@
 package com.firebase.androidchat.Entity;
 
+import java.sql.Time;
 import java.sql.Timestamp;
 
 /**
@@ -11,9 +12,30 @@ public class ChatGroupMember {
     private String prof_id;
     private String prof_name;
    private String prof_avatar;
+
+    public Timestamp getJoinDate() {
+        return joinDate;
+    }
+
+    public void setJoinDate(Timestamp joinDate) {
+        this.joinDate = joinDate;
+    }
+
+    private Timestamp joinDate;
 private ChatGroupMember(){
 
 }
+    public ChatGroupMember(String prof_id,
+                           String prof_name,
+                           String prof_avatar,
+                           Timestamp joinDate){
+        this.prof_id=prof_id;
+        this.prof_name=prof_name;
+        this.prof_avatar=prof_avatar;
+        this.joinDate=joinDate;
+
+
+    }
 
     public String getProf_avatar() {
         return prof_avatar;

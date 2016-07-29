@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.DataSetObserver;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -14,6 +16,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.firebase.androidchat.Adapter.ChatHeaderAdapter;
 import com.firebase.androidchat.Adapter.ChatListAdapter;
 import com.firebase.androidchat.Entity.Chat;
 import com.firebase.androidchat.Entity.ChatHistory;
@@ -24,26 +27,32 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class MainActivity extends Activity {
 
     private  Firebase mFirebaseChatPerson1 ;
     private String mProf_id,mProf_id_Others;
     private ValueEventListener mConnectedListener;
     private ChatListAdapter mChatListAdapter;
+    private ChatHeaderAdapter mChatHeaderAdapter;
     private FirebaseHelper fbh=new FirebaseHelper();
-    ListView listView;
+    ListView listView,listviewHeader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         listView=(ListView)findViewById(R.id.list);
+        listviewHeader=(ListView)findViewById(R.id.listheader);
         Intent intent = getIntent();
         String username = intent.getStringExtra("prof_id");
         mProf_id_Others = intent.getStringExtra("prof_id_Others");
 
         mProf_id=username;
         Firebase firebaseProf=fbh.getFirebaseProfile(mProf_id);
+
         firebaseProf.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
@@ -138,6 +147,50 @@ public class MainActivity extends Activity {
                 }
             }
         });
+        inputText.addTextChangedListener(new TextWatcher() {
+
+            boolean isTyping = false;
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            private Timer timer = new Timer();
+            private final long DELAY = 1000; // milliseconds
+
+            @Override
+            public void afterTextChanged(final Editable s) {
+               // Log.d("", "");
+                if(!isTyping) {
+                  //  Log.d(TAG, "started typing");
+                    // Send notification for start typing event
+                    isTyping = true;
+                    FirebaseHelper fbh = new FirebaseHelper();
+                    fbh.set_is_typing(mProf_id, mProf_id_Others,"1");
+
+
+                }
+                timer.cancel();
+                timer = new Timer();
+                timer.schedule(
+                        new TimerTask() {
+                            @Override
+                            public void run() {
+                                isTyping = false;
+                             //   Log.d(TAG, "stopped typing");
+                                //send notification for stopped typing event
+                                FirebaseHelper fbh = new FirebaseHelper();
+                                fbh.set_is_typing(mProf_id, mProf_id_Others,"0");
+
+
+                            }
+                        },
+                        DELAY
+                );
+            }
+        });
+
     }
 /*
     @Override
@@ -168,9 +221,10 @@ public class MainActivity extends Activity {
         mChatListAdapter.cleanup();
     }
 private void refreshList(){
+
  //   final ListView listView = getListView();
-    //mChatListAdapter = fbh.getFirstChatAdapter(50,R.layout.chat_message,
-    mChatListAdapter = fbh.getChatAdapter("-KNkw2QDcuhv28NN-s7t",5,R.layout.chat_message,
+   mChatListAdapter = fbh.getFirstChatAdapter(50,R.layout.chat_message,
+   // mChatListAdapter = fbh.getChatAdapter("-KNkw2QDcuhv28NN-s7t",5,R.layout.chat_message,
     this,mProf_id,mProf_id_Others);
             //new ChatListAdapter(mFirebaseChatPerson1.limit(50), this, R.layout.chat_message, mUsername);
     listView.setAdapter(mChatListAdapter);
@@ -181,6 +235,21 @@ private void refreshList(){
             listView.setSelection(mChatListAdapter.getCount() - 1);
         }
     });
+
+
+     mChatHeaderAdapter =fbh.getHeaderSingleCHatAdapter( R.layout.chat_header,this,mProf_id,mProf_id_Others);
+
+            //fbh.getFirstHistoryAdapter(50,R.layout.chat_history,this,mProf_id);
+    //new ChatHistoryListAdapter(mFirebaseHistory.limit(50), this, R.layout.chat_history );
+   listviewHeader.setAdapter(mChatHeaderAdapter);
+    mChatHeaderAdapter.registerDataSetObserver(new DataSetObserver() {
+        @Override
+        public void onChanged() {
+        super.onChanged();
+            listviewHeader.setSelection(mChatHeaderAdapter.getCount() - 1);
+        }
+     });
+
 
 }
 

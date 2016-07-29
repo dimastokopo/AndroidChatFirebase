@@ -11,43 +11,31 @@ public class ChatUsersProfile {
     private String prof_id;
     private String prof_name;
     private String prof_avatar;
-    private String is_typing;
-
-
-
-    private String status;
+  private String status;
     private String status_desc;
 
-
-//private ChatUsersProfile(){
-
-//}
     public ChatUsersProfile(){
         this.prof_id = "";
         this.prof_avatar = "";
         this.prof_name="";
+        this.status="";
+        this.status_desc="";
+
     }
     public ChatUsersProfile(String prof_id, String prof_avatar,String prof_name) {
         this.prof_id = prof_id;
         this.prof_avatar = prof_avatar;
         this.prof_name=prof_name;
-        this.is_typing="0";
+
         this.status="";
         this.status_desc="";
     }
-    public ChatUsersProfile(String prof_id, String prof_avatar,String prof_name,String is_typing) {
+
+    public ChatUsersProfile(String prof_id, String prof_avatar,String prof_name ,String status,String status_desc) {
         this.prof_id = prof_id;
         this.prof_avatar = prof_avatar;
         this.prof_name=prof_name;
-        this.is_typing=is_typing;
-        this.status="";
-        this.status_desc="";
-    }
-    public ChatUsersProfile(String prof_id, String prof_avatar,String prof_name,String is_typing,String status,String status_desc) {
-        this.prof_id = prof_id;
-        this.prof_avatar = prof_avatar;
-        this.prof_name=prof_name;
-        this.is_typing=is_typing;
+
         this.status=status;
         this.status_desc=status_desc;
     }
@@ -56,13 +44,6 @@ public class ChatUsersProfile {
     @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonIgnore(true)
 
-public String getIs_typing() {
-    return is_typing;
-}
-
-    public void setIs_typing(String is_typing) {
-        this.is_typing = is_typing;
-    }
 
     public String getStatus() {
         return status;

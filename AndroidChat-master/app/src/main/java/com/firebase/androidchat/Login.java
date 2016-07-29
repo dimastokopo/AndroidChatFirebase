@@ -14,7 +14,7 @@ import com.firebase.androidchat.util.FirebaseHelper;
 import java.util.Random;
 
 public class Login extends Activity {
-Button btnLogin,btnreg,btnConnect;
+Button btnLogin,btnreg,btnConnect,btncreateGroup;
     EditText txtUsername,txtusernameReg,txtProf_id_reg,txtAvatar,txtProf_id_session,txtProf_id_page;
     private String mUsername;
     @Override
@@ -31,9 +31,17 @@ Button btnLogin,btnreg,btnConnect;
         txtAvatar=(EditText)findViewById(R.id.avatarreg);
         txtProf_id_session=(EditText)findViewById(R.id.prof_id_session);
         txtProf_id_page=(EditText)findViewById(R.id.prof_id_page);
+        btncreateGroup=(Button)findViewById(R.id.btnCreateGroup);
 
+btncreateGroup.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        Intent intent = new Intent(Login.this, NewGroup.class);
 
-
+        intent.putExtra("prof_id", mUsername);
+        startActivity(intent);
+    }
+});
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
